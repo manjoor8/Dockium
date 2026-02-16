@@ -73,7 +73,13 @@ async fn main() -> anyhow::Result<()> {
         .with_state(state);
 
     // Start Server
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
+    let host = std::env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_string());
+    let port = std::env::var("PORT")
+        .unwrap_or_else(|_| "8080".to_string())
+        .parse::<u16>()
+        .unwrap_or(8080);
+    
+    let addr: SocketAddr = format!("{}:{}", host, port).parse()?;
     tracing::info!("Listening on {}", addr);
     
     let listener = tokio::net::TcpListener::bind(addr).await?;
