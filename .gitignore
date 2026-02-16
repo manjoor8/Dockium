@@ -23,3 +23,17 @@ Thumbs.db
 # Environment
 .env
 *.local
+
+# Logs
+/backend/build_err.txt
+/backend/build_log.txt
+/backend/build_log_utf8.txt
+/frontend/frontend_log.txt
+
+# Release
+/release/
+
+# TypeScript Output
+/frontend/src/**/*.js
+/frontend/src/**/*.d.ts
+/frontend/src/**/*.map

@@ -98,7 +98,7 @@ async fn handle_logs_ws(mut socket: WebSocket, state: AppState, id: String) {
     let mut logs_stream = match state.docker.get_container_logs(&id).await {
         Ok(stream) => stream,
         Err(e) => {
-            let _ = socket.send(Message::Text(format!("Error: {}", e))).await;
+            let _ = socket.send(Message::Text(format!("Error: {}", e).into())).await;
             return;
         }
     };
@@ -107,7 +107,7 @@ async fn handle_logs_ws(mut socket: WebSocket, state: AppState, id: String) {
         match log {
             Ok(output) => {
                 let msg = format!("{}", output);
-                if socket.send(Message::Text(msg)).await.is_err() {
+                if socket.send(Message::Text(msg.into())).await.is_err() {
                     break;
                 }
             }

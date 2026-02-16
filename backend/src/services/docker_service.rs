@@ -13,15 +13,15 @@ pub struct DockerService {
 
 impl DockerService {
     pub fn new() -> Result<Self> {
-        // Connect to local docker socket
-        let client = Docker::connect_with_unix_defaults()?;
+        // Connect with defaults (handles unix/windows automatically)
+        let client = Docker::connect_with_defaults()?;
         Ok(Self { client })
     }
 
     // --- Container Methods ---
 
     pub async fn list_containers(&self, all: bool) -> Result<Vec<bollard::service::ContainerSummary>> {
-        let options = Some(ListContainersOptions {
+        let options = Some(ListContainersOptions::<String> {
             all,
             ..Default::default()
         });

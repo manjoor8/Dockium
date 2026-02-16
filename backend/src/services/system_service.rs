@@ -1,4 +1,4 @@
-use sysinfo::{System, SystemExt, CpuExt, NetworkExt, DiskExt};
+use sysinfo::{System, Disks, Networks};
 use std::sync::{Arc, Mutex};
 use serde::Serialize;
 
@@ -50,19 +50,21 @@ impl SystemService {
         let cpu_usage = sys.global_cpu_info().cpu_usage();
         let memory_total = sys.total_memory();
         let memory_used = sys.used_memory();
-        let uptime = sys.uptime();
-        let os_name = sys.name().unwrap_or_default();
-        let os_version = sys.os_version().unwrap_or_default();
-        let kernel_version = sys.kernel_version().unwrap_or_default();
+        let uptime = System::uptime();
+        let os_name = System::name().unwrap_or_default();
+        let os_version = System::os_version().unwrap_or_default();
+        let kernel_version = System::kernel_version().unwrap_or_default();
 
-        let disks = sys.disks().iter().map(|d| DiskInfo {
+        let disks_list = Disks::new_with_refreshed_list();
+        let disks = disks_list.iter().map(|d| DiskInfo {
             name: format!("{:?}", d.name()),
             mount_point: d.mount_point().to_string_lossy().to_string(),
             total_space: d.total_space(),
             available_space: d.available_space(),
         }).collect();
 
-        let networks = sys.networks().iter().map(|(name, data)| NetworkInfo {
+        let networks_list = Networks::new_with_refreshed_list();
+        let networks = networks_list.iter().map(|(name, data)| NetworkInfo {
             interface: name.clone(),
             received: data.received(),
             transmitted: data.transmitted(),

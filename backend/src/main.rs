@@ -9,12 +9,9 @@ use std::sync::Arc;
 use dotenvy::dotenv;
 
 mod api;
-mod config;
 mod db;
-mod middleware;
 mod models;
 mod services;
-mod utils;
 
 use crate::services::docker_service::DockerService;
 use crate::services::system_service::SystemService;

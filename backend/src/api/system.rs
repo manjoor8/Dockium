@@ -32,7 +32,7 @@ async fn handle_stats_ws(mut socket: WebSocket, state: AppState) {
         let stats = state.system.get_stats();
         let json = serde_json::to_string(&stats).unwrap_or_default();
         
-        if socket.send(Message::Text(json)).await.is_err() {
+        if socket.send(Message::Text(json.into())).await.is_err() {
             break;
         }
         
