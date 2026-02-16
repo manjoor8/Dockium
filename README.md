@@ -1,10 +1,10 @@
-# 🌌 Dockium
+# Dockium
 
 **Dockium** is a production-ready, high-performance Docker Management Web Application designed for Linux servers. Built with **Rust** for the backend and **React** for the frontend, it provides a secure, lightweight, and real-time interface to manage your container ecosystem.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```ascii
 +---------------------------------------+
@@ -36,19 +36,19 @@
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-- ✅ **Automatic Docker Installation**: Detects and installs Docker on Ubuntu/Debian/RHEL/AlmaLinux/Rocky.
-- ✅ **Full Container Lifecycle**: Start, stop, restart, remove, and create containers.
-- ✅ **Real-time Monitoring**: Dashboard with CPU, RAM, Disk, and Network bandwidth.
-- ✅ **Terminal & Logs**: Live log streaming and `exec` terminal via xterm.js.
-- ✅ **Image Management**: List, pull, and tag images.
-- ✅ **Secure Access**: JWT Authentication with Role-Based Access Control (Admin, Operator, Viewer).
-- ✅ **First Run Setup**: Securely setup the first admin account on startup.
+-  **Automatic Docker Installation**: Detects and installs Docker on Ubuntu/Debian/RHEL/AlmaLinux/Rocky.
+-  **Full Container Lifecycle**: Start, stop, restart, remove, and create containers.
+-  **Real-time Monitoring**: Dashboard with CPU, RAM, Disk, and Network bandwidth.
+-  **Terminal & Logs**: Live log streaming and `exec` terminal via xterm.js.
+-  **Image Management**: List, pull, and tag images.
+-  **Secure Access**: JWT Authentication with Role-Based Access Control (Admin, Operator, Viewer).
+-  **First Run Setup**: Securely setup the first admin account on startup.
 
 ---
 
-## 🛠️ Installation (Linux)
+## Installation (Linux)
 
 ### 1. Manual Installation
 Clone this repository and run the installation script:
@@ -65,19 +65,14 @@ The script will:
 3. Setup `dockium` system user and permissions.
 4. Install the service and enable it via `systemd`.
 
-### 2. Docker Deployment
-You can run Dockium as a container itself:
-
-```bash
-docker run -d \
-  --name dockium \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v dockium-data:/data \
-  -p 8080:8080 \
-  dockium/dockium:latest
-```
 
 ---
+## Deployment
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
 
 ## 🔒 Security Best Practices
 
