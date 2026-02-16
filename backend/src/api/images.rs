@@ -11,6 +11,7 @@ pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/", get(list_images))
         .route("/pull", post(pull_image))
+        .route("/:id", delete(remove_image))
 }
 
 async fn list_images(State(state): State<AppState>) -> impl IntoResponse {
@@ -26,6 +27,16 @@ async fn pull_image(
 ) -> impl IntoResponse {
     let image = payload["image"].as_str().unwrap_or_default();
     match state.docker.pull_image(image).await {
+        Ok(_) => axum::http::StatusCode::OK.into_response(),
+        Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+    }
+}
+
+async fn remove_image(
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    match state.docker.remove_image(&id).await {
         Ok(_) => axum::http::StatusCode::OK.into_response(),
         Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }

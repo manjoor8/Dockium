@@ -15,12 +15,16 @@ mod services;
 
 use crate::services::docker_service::DockerService;
 use crate::services::system_service::SystemService;
+use crate::services::compose_service::ComposeService;
+use crate::services::settings_service::SettingsService;
 use crate::db::Database;
 
 #[derive(Clone)]
 pub struct AppState {
     pub docker: Arc<DockerService>,
     pub system: Arc<SystemService>,
+    pub compose: Arc<ComposeService>,
+    pub settings: Arc<SettingsService>,
     pub db: Arc<Database>,
 }
 
@@ -45,10 +49,14 @@ async fn main() -> anyhow::Result<()> {
     // Initialize Services
     let docker = Arc::new(DockerService::new()?);
     let system = Arc::new(SystemService::new());
+    let compose = Arc::new(ComposeService::new());
+    let settings = Arc::new(SettingsService::new(db.clone()));
 
     let state = AppState {
         docker,
         system,
+        compose,
+        settings,
         db,
     };
 
@@ -66,6 +74,8 @@ async fn main() -> anyhow::Result<()> {
         .nest("/api/networks", api::networks::routes())
         .nest("/api/volumes", api::volumes::routes())
         .nest("/api/system", api::system::routes())
+        .nest("/api/compose", api::compose::routes())
+        .nest("/api/settings", api::settings::routes())
         .layer(cors)
         .with_state(state);
 

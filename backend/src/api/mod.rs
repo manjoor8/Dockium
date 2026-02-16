@@ -4,3 +4,5 @@ pub mod images;
 pub mod networks;
 pub mod volumes;
 pub mod system;
+pub mod compose;
+pub mod settings;

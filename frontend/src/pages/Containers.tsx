@@ -8,7 +8,8 @@ import {
     ExternalLink,
     Terminal as TerminalIcon,
     Search,
-    Plus
+    Plus,
+    X
 } from 'lucide-react';
 import axios from 'axios';
 import { clsx } from 'clsx';
@@ -26,6 +27,9 @@ interface ContainerSummary {
 
 export default function Containers() {
     const [search, setSearch] = useState('');
+    const [isCreating, setIsCreating] = useState(false);
+    const [newName, setNewName] = useState('');
+    const [newImage, setNewImage] = useState('');
 
     const { data: containers, isLoading, refetch } = useQuery<ContainerSummary[]>({
         queryKey: ['containers'],
@@ -34,6 +38,40 @@ export default function Containers() {
             return res.data;
         }
     });
+
+    const handleAction = async (id: string, action: string) => {
+        try {
+            if (action === 'remove') {
+                if (!confirm('Are you sure you want to remove this container?')) return;
+                await axios.delete(`/api/containers/${id}/remove`);
+            } else {
+                await axios.post(`/api/containers/${id}/${action}`);
+            }
+            refetch();
+        } catch (error) {
+            alert(`Failed to ${action} container`);
+        }
+    };
+
+    const handleCreate = async () => {
+        if (!newName || !newImage) return;
+        try {
+            await axios.post('/api/containers', {
+                name: newName,
+                config: {
+                    Image: newImage,
+                    Tty: true
+                }
+            });
+            alert('Container created successfully!');
+            setIsCreating(false);
+            setNewName('');
+            setNewImage('');
+            refetch();
+        } catch (error) {
+            alert('Failed to create container. Make sure the image exists.');
+        }
+    };
 
     const filteredContainers = containers?.filter(c =>
         c.Names[0].toLowerCase().includes(search.toLowerCase()) ||
@@ -58,11 +96,49 @@ export default function Containers() {
                     <h2 className="text-3xl font-bold text-slate-800 dark:text-white">Containers</h2>
                     <p className="text-slate-500 mt-1">Manage and monitor all Docker containers on this host.</p>
                 </div>
-                <button className="btn-primary flex items-center gap-2">
+                <button
+                    onClick={() => setIsCreating(true)}
+                    className="btn-primary flex items-center gap-2"
+                >
                     <Plus className="w-5 h-5" />
                     Create Container
                 </button>
             </div>
+
+            {isCreating && (
+                <div className="card border-primary-500/50 bg-primary-500/5 animate-in slide-in-from-top-2 relative">
+                    <button onClick={() => setIsCreating(false)} className="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+                        <X className="w-5 h-5" />
+                    </button>
+                    <h4 className="font-bold mb-6 text-lg">Quick Create Container</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-500 uppercase">Container Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g. my-app"
+                                value={newName}
+                                onChange={(e) => setNewName(e.target.value)}
+                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-slate-500 uppercase">Image Name</label>
+                            <input
+                                type="text"
+                                placeholder="e.g. nginx:latest"
+                                value={newImage}
+                                onChange={(e) => setNewImage(e.target.value)}
+                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none"
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                        <button onClick={() => setIsCreating(false)} className="px-4 py-2 text-slate-500 font-bold">Cancel</button>
+                        <button onClick={handleCreate} className="btn-primary">Create & Start</button>
+                    </div>
+                </div>
+            )}
 
             <div className="card !p-0 overflow-hidden">
                 <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -139,15 +215,24 @@ export default function Containers() {
                                                 </button>
                                                 <div className="w-px h-4 bg-slate-200 dark:bg-slate-800 mx-1"></div>
                                                 {container.State === 'running' ? (
-                                                    <button className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg text-slate-400 hover:text-rose-600">
+                                                    <button
+                                                        onClick={() => handleAction(container.Id, 'stop')}
+                                                        className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg text-slate-400 hover:text-rose-600"
+                                                    >
                                                         <Square className="w-4 h-4" />
                                                     </button>
                                                 ) : (
-                                                    <button className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-lg text-slate-400 hover:text-emerald-600">
+                                                    <button
+                                                        onClick={() => handleAction(container.Id, 'start')}
+                                                        className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-lg text-slate-400 hover:text-emerald-600"
+                                                    >
                                                         <Play className="w-4 h-4" />
                                                     </button>
                                                 )}
-                                                <button className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg text-slate-400 hover:text-rose-600">
+                                                <button
+                                                    onClick={() => handleAction(container.Id, 'remove')}
+                                                    className="p-2 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-lg text-slate-400 hover:text-rose-600"
+                                                >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>

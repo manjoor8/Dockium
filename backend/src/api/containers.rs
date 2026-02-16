@@ -17,6 +17,7 @@ pub struct ListOptions {
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/", get(list_containers))
+        .route("/", post(create_container))
         .route("/:id/start", post(start_container))
         .route("/:id/stop", post(stop_container))
         .route("/:id/restart", post(restart_container))
@@ -113,5 +114,22 @@ async fn handle_logs_ws(mut socket: WebSocket, state: AppState, id: String) {
             }
             Err(_) => break,
         }
+    }
+}
+
+async fn create_container(
+    State(state): State<AppState>,
+    Json(payload): Json<serde_json::Value>,
+) -> impl IntoResponse {
+    let name = payload["name"].as_str().unwrap_or_default();
+    let config_json = payload["config"].clone();
+    let config: bollard::container::Config<String> = match serde_json::from_value(config_json) {
+        Ok(c) => c,
+        Err(e) => return (axum::http::StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+    };
+
+    match state.docker.create_container(name, config).await {
+        Ok(response) => Json(response).into_response(),
+        Err(e) => (axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
     }
 }

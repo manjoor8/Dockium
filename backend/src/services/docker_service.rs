@@ -1,8 +1,8 @@
 use bollard::Docker;
 use bollard::container::{ListContainersOptions, Config, CreateContainerOptions, StartContainerOptions, LogOutput};
-use bollard::image::ListImagesOptions;
-use bollard::network::ListNetworksOptions;
-use bollard::volume::ListVolumesOptions;
+use bollard::image::{ListImagesOptions, RemoveImageOptions};
+use bollard::network::{ListNetworksOptions, CreateNetworkOptions};
+use bollard::volume::{ListVolumesOptions, CreateVolumeOptions};
 use futures::StreamExt;
 use std::collections::HashMap;
 use anyhow::Result;
@@ -65,6 +65,15 @@ impl DockerService {
         Ok(container)
     }
 
+    pub async fn create_container(&self, name: &str, config: Config<String>) -> Result<bollard::service::ContainerCreateResponse> {
+        let options = Some(CreateContainerOptions {
+            name: name.to_string(),
+            ..Default::default()
+        });
+        let response = self.client.create_container(options, config).await?;
+        Ok(response)
+    }
+
     // --- Image Methods ---
 
     pub async fn list_images(&self) -> Result<Vec<bollard::service::ImageSummary>> {
@@ -87,15 +96,40 @@ impl DockerService {
         Ok(())
     }
 
+    pub async fn remove_image(&self, id: &str) -> Result<()> {
+        self.client.remove_image(id, None::<RemoveImageOptions>, None).await?;
+        Ok(())
+    }
+
     // --- Network Methods ---
     pub async fn list_networks(&self) -> Result<Vec<bollard::service::Network>> {
         let networks = self.client.list_networks(Some(ListNetworksOptions::<String>::default())).await?;
         Ok(networks)
     }
 
+    pub async fn create_network(&self, options: CreateNetworkOptions<String>) -> Result<bollard::service::NetworkCreateResponse> {
+        let response = self.client.create_network(options).await?;
+        Ok(response)
+    }
+
+    pub async fn remove_network(&self, id: &str) -> Result<()> {
+        self.client.remove_network(id).await?;
+        Ok(())
+    }
+
     // --- Volume Methods ---
     pub async fn list_volumes(&self) -> Result<Vec<bollard::service::Volume>> {
         let volumes = self.client.list_volumes(Some(ListVolumesOptions::<String>::default())).await?;
         Ok(volumes.volumes.unwrap_or_default())
+    }
+
+    pub async fn create_volume(&self, options: CreateVolumeOptions<String>) -> Result<bollard::service::Volume> {
+        let response = self.client.create_volume(options).await?;
+        Ok(response)
+    }
+
+    pub async fn remove_volume(&self, id: &str) -> Result<()> {
+        self.client.remove_volume(id, None).await?;
+        Ok(())
     }
 }
