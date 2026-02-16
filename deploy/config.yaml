@@ -1,0 +1,36 @@
+# Dockium Configuration Example
+
+server:
+  host: 0.0.0.0
+  port: 8080
+  # ssl:
+  #   enabled: true
+  #   cert: /etc/dockium/certs/fullchain.pem
+  #   key: /etc/dockium/certs/privkey.pem
+
+database:
+  url: "sqlite:dockium.db"
+
+docker:
+  socket_path: "/var/run/docker.sock"
+  # Set to true to allow remote docker management (not recommended for production)
+  # remote_host: "tcp://1.2.3.4:2375"
+
+security:
+  jwt_secret: "CHANGE_ME_IN_PRODUCTION"
+  admin_setup_enabled: true
+  session_timeout: 86400  # 24 hours in seconds
+
+monitoring:
+  stats_interval_seconds: 2
+  notification_thresholds:
+    cpu_percent: 90
+    memory_percent: 95
+    disk_percent: 90
+
+logging:
+  level: info
+  file_path: "/var/log/dockium/dockium.log"
+  rotate: true
+  max_size_mb: 100
+  max_backups: 5

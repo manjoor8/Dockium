@@ -1,0 +1,40 @@
+[package]
+name = "dockium-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Web framework
+axum = { version = "0.7", features = ["ws", "macros"] }
+tokio = { version = "1.36", features = ["full"] }
+tower-http = { version = "0.5", features = ["cors", "fs", "trace"] }
+
+# Docker API
+bollard = "0.15"
+
+# System monitoring
+sysinfo = "0.30"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+yaml-rust = "0.4"
+
+# Auth
+jsonwebtoken = "9.2"
+bcrypt = "0.15"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Database
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "chrono"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Utilities
+uuid = { version = "1.7", features = ["v4", "serde"] }
+futures = "0.3"
+async-trait = "0.1"
+anyhow = "1.0"
+dotenvy = "0.15"
