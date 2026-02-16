@@ -6,13 +6,18 @@ import {
     Network,
     HardDrive,
     Terminal,
-    Settings,
+    Settings as SettingsIcon,
     Bell,
     Search,
     User
 } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Containers from './pages/Containers';
+import Images from './pages/Images';
+import Networks from './pages/Networks';
+import Volumes from './pages/Volumes';
+import Compose from './pages/Compose';
+import Settings from './pages/Settings';
 import { clsx } from 'clsx';
 
 function App() {
@@ -25,7 +30,7 @@ function App() {
         { label: 'Networks', icon: Network, path: '/networks' },
         { label: 'Volumes', icon: HardDrive, path: '/volumes' },
         { label: 'Docker Compose', icon: Terminal, path: '/compose' },
-        { label: 'Settings', icon: Settings, path: '/settings' },
+        { label: 'Settings', icon: SettingsIcon, path: '/settings' },
     ];
 
     return (
@@ -98,8 +103,11 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/containers" element={<Containers />} />
-                        {/* Fallback */}
-                        <Route path="*" element={<div className="flex items-center justify-center h-full">Coming Soon</div>} />
+                        <Route path="/images" element={<Images />} />
+                        <Route path="/networks" element={<Networks />} />
+                        <Route path="/volumes" element={<Volumes />} />
+                        <Route path="/compose" element={<Compose />} />
+                        <Route path="/settings" element={<Settings />} />
                     </Routes>
                 </div>
             </main>
